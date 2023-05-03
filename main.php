@@ -54,7 +54,7 @@ if ($csvData === false) {
 }
 
 // parse CSV data into array
-$dataArray = array_map('str_getcsv', explode("\n", trim($csvData)));
+$dataArray = parseCsv($csvData);
 $headers = array_shift($dataArray);
 $data = array();
 foreach ($dataArray as $row) {
@@ -131,4 +131,27 @@ if ($upsertSuccessful) {
     echo 'Data written to MongoDB and CSV file moved to completed directory.';
 } else {
     echo 'Upsert failed. CSV file not moved.';
+}
+
+function parseCsv($csv_string, $delimiter = ",", $skip_empty_lines = true, $trim_fields = true)  {
+    return array_map(
+        function ($line) use ($delimiter, $trim_fields) {
+            return array_map(
+                function ($field) {
+                    return str_replace('!!Q!!', '"', utf8_decode(urldecode($field)));
+                },
+                $trim_fields ? array_map('trim', explode($delimiter, $line)) : explode($delimiter, $line)
+            );
+        },
+        preg_split(
+            $skip_empty_lines ? ($trim_fields ? '/( *\R)+/s' : '/\R+/s') : '/\R/s',
+            preg_replace_callback(
+                '/"(.*?)"/s',
+                function ($field) {
+                    return urlencode(utf8_encode($field[1]));
+                },
+                $enc = preg_replace('/(?<!")""/', '!!Q!!', $csv_string)
+            )
+        )
+    );
 }
