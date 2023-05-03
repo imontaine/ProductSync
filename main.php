@@ -90,10 +90,14 @@ foreach ($data as $row) {
         unset($row['additional_attributes']);
     }
 
+    // Convert updated_at and created_at fields to date time fields
+    $row['updated_at'] = new MongoDB\BSON\UTCDateTime(DateTime::createFromFormat('m/d/y, g:i A', $row['updated_at'])->getTimestamp() * 1000);
+    $row['created_at'] = new MongoDB\BSON\UTCDateTime(DateTime::createFromFormat('m/d/y, g:i A', $row['created_at'])->getTimestamp() * 1000);
+
     $filter = ['sku' => $row['sku']];
     $options = ['upsert' => true];
-    // Add 'updated_at' timestamp
-    $row['updated_at'] = new MongoDB\BSON\UTCDateTime();
+    // Add 'mongo_updated_at' timestamp
+    $row['mongo_updated_at'] = new MongoDB\BSON\UTCDateTime();
     $update = ['$set' => $row];
     $result = $mongoCollection->updateOne($filter, $update, $options);
 
