@@ -2,6 +2,7 @@
 # ProductSync
 This repository contains code for ProductSync. To run this code, you need to set the following environment variables.
 
+```
 # SFTP credentials
 SFTP_HOST=example.com
 SFTP_PORT=22
@@ -19,10 +20,14 @@ MONGO_COLLECTION=mycollection
 
 # Webhook URL
 WEBHOOK_URL=https://example.com/webhook
+```
+
 Please create a .env file with the above variables and place it in a folder named /config outside the project directory. The folder structure should be as follows:
 
+```
 config/
 │   └── .env
 project/
 │   └── main.php
 │   └── composer.json
+```
