@@ -1,31 +1,34 @@
 <?php
-require __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
+
+$dotenv = Dotenv\Dotenv::createImmutable(dirname(__DIR__) . '/config');
+$dotenv->load();
 
 use \phpseclib3\Net\SFTP;
 use \MongoDB\Driver\Query;
 use \MongoDB\BSON\Regex;
 
 // SFTP credentials
-$sftpHost = getenv('SFTP_HOST');
-$sftpPort = getenv('SFTP_PORT');
-$sftpUsername = getenv('SFTP_USERNAME');
-$sftpPassword = getenv('SFTP_PASSWORD');
-$sftpExportPath = getenv('SFTP_EXPORT_PATH');
-$sftpCompletedPath = getenv('SFTP_COMPLETED_PATH');
+$sftpHost = $_ENV['SFTP_HOST'];
+$sftpPort = $_ENV['SFTP_PORT'];
+$sftpUsername = $_ENV['SFTP_USERNAME'];
+$sftpPassword = $_ENV['SFTP_PASSWORD'];
+$sftpExportPath = $_ENV['SFTP_EXPORT_PATH'];
+$sftpCompletedPath = $_ENV['SFTP_COMPLETED_PATH'];
 
 // MongoDB credentials
-$mongoUsername = getenv('MONGO_USERNAME');
-$mongoPassword = getenv('MONGO_PASSWORD');
-$mongoHost = getenv('MONGO_HOST');
+$mongoUsername = $_ENV['MONGO_USERNAME'];
+$mongoPassword = $_ENV['MONGO_PASSWORD'];
+$mongoHost = $_ENV['MONGO_HOST'];
 $mongoClient = new MongoDB\Client("{$mongoHost}/admin?retryWrites=true&w=majority", [
     'username' => $mongoUsername,
     'password' => $mongoPassword,
 ]);
-$mongoDb = $mongoClient->selectDatabase(getenv('MONGO_DB'));
-$mongoCollection = $mongoDb->selectCollection(getenv('MONGO_COLLECTION'));
+$mongoDb = $mongoClient->selectDatabase($_ENV['MONGO_DB']);
+$mongoCollection = $mongoDb->selectCollection($_ENV['MONGO_COLLECTION']);
 
 // Webhook URL
-$webhookUrl = getenv('WEBHOOK_URL');
+$webhookUrl = $_ENV['WEBHOOK_URL'];
 
 // connect to SFTP
 $sftp = new SFTP($sftpHost, $sftpPort);
@@ -133,7 +136,7 @@ if ($upsertSuccessful) {
     echo 'Upsert failed. CSV file not moved.';
 }
 
-function parseCsv($csv_string, $delimiter = ",", $skip_empty_lines = true, $trim_fields = true)  {
+function parseCsv($csv_string, $delimiter = ",", $skip_empty_lines = true, $trim_fields = true, $trim_csv = true)  {
     return array_map(
         function ($line) use ($delimiter, $trim_fields) {
             return array_map(
@@ -150,7 +153,7 @@ function parseCsv($csv_string, $delimiter = ",", $skip_empty_lines = true, $trim
                 function ($field) {
                     return urlencode(utf8_encode($field[1]));
                 },
-                $enc = preg_replace('/(?<!")""/', '!!Q!!', $csv_string)
+                $enc = preg_replace('/(?<!")""/', '!!Q!!', $trim_csv ? trim($csv_string) : $csv_string)
             )
         )
     );

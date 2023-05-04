@@ -1,6 +1,7 @@
 {
     "require": {
         "mongodb/mongodb": "^1.15",
-        "phpseclib/phpseclib": "^3.0"
+        "phpseclib/phpseclib": "^3.0",
+        "vlucas/phpdotenv": "^5.5"
     }
 }
