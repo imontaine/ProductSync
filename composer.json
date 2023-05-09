@@ -1,7 +1,18 @@
 {
+    "autoload": {
+        "classmap": ["src/"],
+        "files": ["src/functions.php"]
+    },
     "require": {
         "mongodb/mongodb": "^1.15",
         "phpseclib/phpseclib": "^3.0",
-        "vlucas/phpdotenv": "^5.5"
+        "vlucas/phpdotenv": "^5.5",
+        "league/csv": "^9.0",
+        "amphp/parallel": "^2.1",
+        "ext-mongodb": "*",
+        "react/child-process": "^0.6.5"
+    },
+    "require-dev": {
+        "deployer/deployer": "^7.3"
     }
 }
