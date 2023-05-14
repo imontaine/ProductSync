@@ -142,6 +142,24 @@ function getOldestFileFromFTP($cache=true) {
     return $oldestFile;
 }
 
+function onFinish($csvSplitFile) {
+    // Move the file we just processed to the completed folder
+    moveToCompletedFTP(getOldestFileFromFTP());
+
+    // Move split file (if any)
+    if (isset($csvSplitFile)) {
+        $date = getDateFromFileName(getOldestFileFromFTP());
+        $date->modify("+1 second");
+        $remoteFileName = $date->format('Y-m-d_H-i-s')."_export_catalog_product-SPLIT.csv";
+        echo "splitting file to ".$remoteFileName."\n";
+        rewind($csvSplitFile);
+        uploadToFTP($remoteFileName, $csvSplitFile);
+    }
+
+    // Dispatch webhook
+    sendWebhook($_ENV['WEBHOOK_URL']);
+}
+
 function getDateFromFileName($fileName) {
     $match = preg_match('/\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}/', $fileName, $matches);
     return $match ? DateTime::createFromFormat('Y-m-d_H-i-s', $matches[0]) : null;

@@ -6,6 +6,7 @@ use League\Csv\Reader;
 // Download oldest CSV file from FTP
 try{
     $localCsv = downloadOldestFTPFile();
+    echo "working on the file ".getOldestFileFromFTP()."\n";
 } catch (Exception $e) {
     exit($e->getMessage());
 }
@@ -36,24 +37,16 @@ foreach ($reader as $i => $row)
     $batchProcessor->processDocument([['sku' => $row['sku']], ['$set' => $preparedRow], ['upsert' => true]]);
 }
 
+if (!isset($i)) {
+    onFinish($csvSplitFile);
+    exit;
+}
+
 // Run batch if its has fewer documents then the size limit which triggers processing
 if ($i % $batchProcessor->batchSize > 0) {
     $batchProcessor->addBatchToQueue($batchProcessor->currentBatch);
 }
 
 $batchProcessor->onFinish(function() use ($batchProcessor, $csvSplitFile) {
-    // Move the file we just processed to the completed folder
-    moveToCompletedFTP(getOldestFileFromFTP());
-
-    // Move split file (if any)
-    if (isset($csvSplitFile)) {
-        $date = getDateFromFileName(getOldestFileFromFTP());
-        $date->modify("+1 second");
-        $remoteFileName = $date->format('Y-m-d_H-i-s')."_export_catalog_product-SPLIT.csv";
-        rewind($csvSplitFile);
-        uploadToFTP($remoteFileName, $csvSplitFile);
-    }
-
-    // Dispatch webhook
-    sendWebhook($_ENV['WEBHOOK_URL']);
+    onFinish($csvSplitFile);
 });
