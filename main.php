@@ -27,7 +27,10 @@ foreach ($reader as $i => $row)
 {
     // If reached the max processing limit, split the csv
     if ($i >= ($_ENV['CSV_SPLIT_LIMIT'] ?? 50000)) {
-        $csvSplitFile = tmpfile();
+        if (!$csvSplitFile) {
+            $csvSplitFile = tmpfile();
+            fputcsv($csvSplitFile, $reader->getHeader());
+        }
         fputcsv($csvSplitFile, $row);
         continue;
     }
