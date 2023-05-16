@@ -49,7 +49,7 @@ class BatchProcessor {
         if ($pendingBatch) {
             //echo "Processing first pending batch: ".$pendingBatch->id."\n";
             //time_elapsed();
-            echo "batch ".$pendingBatch->id." started at ". date('Y-m-d H:i:s')."\n";
+            echo "batch ".$pendingBatch->id." with ".count($pendingBatch->documents)." docs started at ". date('Y-m-d H:i:s')."\n";
             $pendingBatch->process(function() use($pendingBatch) {
                 $this->processedQueuedBatch();
                 // Check if all queue batches were processed

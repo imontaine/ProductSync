@@ -24,11 +24,11 @@ class Batch {
     public function process($finishCallback=null) {
         $this->isProcessing = true;
         $start = microtime(true);
-        $process = new Process('php /Users/davinunes/Projects/jomashop/ProductSync/process.php');
+        $process = new Process('php '.__DIR__.'/../process.php');
         $process->start();
         $process->stdin->write(json_encode($this->documents));
         $process->stdin->end();
-        $timeoutTimer = Loop::addTimer(60 /* 5 minutes */, function () use ($process) {
+        $timeoutTimer = Loop::addTimer(300 /* 5 minutes */, function () use ($process) {
             $process->terminate();
         });
         $process->on('exit', function ($code) use ($finishCallback, $start, $timeoutTimer) {
@@ -41,9 +41,9 @@ class Batch {
             $finishCallback && $finishCallback($code);
         });
 
-//        $process->stdout->on('data', function ($chunk) {
-//            echo "batch ".$this->id." returned: ".$chunk."\n";
-//        });
+        $process->stdout->on('data', function ($chunk) {
+            echo "batch ".$this->id." returned: ".$chunk."\n";
+        });
     }
 
 }

@@ -25,21 +25,6 @@ function prepareRow($row) {
         $row['additional_attributes_expanded'] = processAdditionalAttributes($row['additional_attributes']);
         unset($row['additional_attributes']);
     }
-
-    // Convert updated_at and created_at fields to date time fields
-    if ($row['updated_at']) {
-        $row['updated_at'] = new MongoDB\BSON\UTCDateTime(DateTime::createFromFormat('m/d/y, g:i A',
-                $row['updated_at'])->getTimestamp() * 1000);
-    }
-
-    if ($row['created_at']) {
-        new MongoDB\BSON\UTCDateTime(DateTime::createFromFormat('m/d/y, g:i A',
-                $row['created_at'])->getTimestamp() * 1000);
-    }
-
-    // Add 'mongo_updated_at' timestamp
-    $row['mongo_updated_at'] = new MongoDB\BSON\UTCDateTime();
-
     // Remove sku from document payload for mongo performance reasons
     unset($row['sku']);
 
