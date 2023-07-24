@@ -6,7 +6,8 @@ use League\Csv\Reader;
 // Download oldest CSV file from FTP
 try{
     $localCsv = downloadOldestFTPFile();
-    echo "working on the file ".getOldestFileFromFTP()."\n";
+    $workingFileName = getOldestFileFromFTP();
+    echo "working on the file ".$workingFileName."\n";
 } catch (Exception $e) {
     exit($e->getMessage());
 }
@@ -35,7 +36,8 @@ foreach ($reader as $i => $row)
         continue;
     }
     // Prepare row
-    $preparedRow = prepareRow($row);
+    $internalMetaData =  ['last_found_in_file' => $workingFileName];
+    $preparedRow = prepareRow(array_merge($row, ['_internal_metadata' => $internalMetaData]));
     // Process row
     $batchProcessor->processDocument([['sku' => $row['sku']], ['$set' => $preparedRow], ['upsert' => true]]);
 }
