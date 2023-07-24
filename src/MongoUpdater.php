@@ -13,7 +13,28 @@ class MongoUpdater
         ['created_at', 'm/d/y, g:i A'],
         ['updated_at', 'm/d/y, g:i A'],
         ['new_from_date', 'm/d/y'],
-        ['new_to_date', 'm/d/y']
+        ['new_to_date', 'm/d/y'],
+        ['special_price_from_date', 'm/d/y'],
+        ['special_price_to_date', 'm/d/y'],
+    ];
+
+    public static $INT_FIELDS = [
+        'website_id',
+        'on_hand_priority'
+    ];
+
+    public static $FLOAT_FIELDS = [
+        'weight',
+        'qty',
+        'max_cart_qty',
+        'min_cart_qty',
+    ];
+
+    public static $DECIMAL_FIELDS = [
+        'special_price',
+        'msrp_price',
+        'price',
+        'promotext_value',
     ];
 
     public function __construct(
@@ -37,6 +58,30 @@ class MongoUpdater
                     $attr[$attrName] = $this->convertToMongoDate($attr[$attrName], $dateField[1]);
                 }
             }
+
+            // Convert data types
+            foreach (self::$INT_FIELDS as $field) {
+                if (isset($attr[$field]) && !empty($attr[$field])) {
+                    try {
+                        $attr[$field] = intval($attr[$field]);
+                    } catch (\Exception $e) {/* swallow */}
+                }
+            }
+            foreach (self::$FLOAT_FIELDS as $field) {
+                if (isset($attr[$field]) && !empty($attr[$field])) {
+                    try {
+                        $attr[$field] = floatval($attr[$field]);
+                    } catch (\Exception $e) {/* swallow */}
+                }
+            }
+            foreach (self::$DECIMAL_FIELDS as $field) {
+                if (isset($attr[$field]) && !empty($attr[$field])) {
+                    try {
+                       $attr[$field] = new MongoDB\BSON\Decimal128($attr[$field]);
+                    } catch (\Exception $e) {/* swallow */}
+                }
+            }
+
             // Exclude fields
             foreach (self::$EXCLUDE_FIELDS as $field) {
                 if (isset($attr[$field]) && !empty($attr[$field])) {
