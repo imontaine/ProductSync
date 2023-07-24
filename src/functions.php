@@ -21,8 +21,10 @@ function processAdditionalAttributes($additional_attributes)
 
 function prepareRow($row) {
 
+    // Process and flat additional_attributes
     if (isset($row['additional_attributes'])) {
-        $row['additional_attributes_expanded'] = processAdditionalAttributes($row['additional_attributes']);
+        $additionalAttributes = processAdditionalAttributes($row['additional_attributes']);
+        $row = array_merge($row, $additionalAttributes);
         unset($row['additional_attributes']);
     }
     // Remove sku from document payload for mongo performance reasons
