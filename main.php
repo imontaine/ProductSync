@@ -24,6 +24,8 @@ try{
     exit($e->getMessage());
 }
 
+$columnsToExclude = array_combine(MongoUpdater::$EXCLUDE_FIELDS, array_fill(0, count(MongoUpdater::$EXCLUDE_FIELDS), ''));
+
 foreach ($reader as $i => $row)
 {
     // If reached the max processing limit, split the csv
@@ -39,7 +41,7 @@ foreach ($reader as $i => $row)
     $internalMetaData =  ['last_found_in_file' => $workingFileName];
     $preparedRow = prepareRow(array_merge($row, ['_internal_metadata' => $internalMetaData]));
     // Process row
-    $batchProcessor->processDocument([['sku' => $row['sku']], ['$set' => $preparedRow], ['upsert' => true]]);
+    $batchProcessor->processDocument([['sku' => $row['sku']], ['$set' => $preparedRow, '$unset' => $columnsToExclude], ['upsert' => true]]);
 }
 
 if (!isset($i)) {

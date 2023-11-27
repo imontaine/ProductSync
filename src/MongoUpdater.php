@@ -84,7 +84,7 @@ class MongoUpdater
 
             // Exclude fields
             foreach (self::$EXCLUDE_FIELDS as $field) {
-                if (isset($attr[$field]) && !empty($attr[$field])) {
+                if (isset($attr[$field])) {
                     unset($attr[$field]);
                 }
             }
