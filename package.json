@@ -1,0 +1,48 @@
+{
+    "name": "productsync",
+    "version": "1.0.0",
+    "description": "Reads CSV files from an SFTP server and imports them into a DB.",
+    "scripts": {
+        "queue-consumer": "ts-node ./src/QueueConsumer.ts",
+        "queue-publisher": "ts-node ./src/QueuePublisher.ts",
+        "prettier": "npx prettier . --write",
+        "build": "rm -rf build && tsc",
+        "test": "ts-node test.ts"
+    },
+    "type": "module",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/imontaine/ProductSync.git"
+    },
+    "prettier": {
+        "tabWidth": 4,
+        "singleQuote": true,
+        "printWidth": 115
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/imontaine/ProductSync/issues"
+    },
+    "homepage": "https://github.com/imontaine/ProductSync#readme",
+    "dependencies": {
+        "csv-parser": "^3.0.0",
+        "dotenv": "^16.3.1",
+        "mongodb": "^6.3.0",
+        "node-fetch": "^3.3.2",
+        "p-queue": "^7.4.1",
+        "pure-function-decorator": "^2.0.1",
+        "sqlite3": "^5.1.6",
+        "ssh2-sftp-client": "^9.1.0",
+        "ts-node": "^10.9.1",
+        "typescript": "^5.3.2",
+        "underscore": "^1.13.6"
+    },
+    "devDependencies": {
+        "@types/node": "^20.10.1",
+        "@types/sqlite3": "^3.1.11",
+        "@types/ssh2-sftp-client": "^9.0.3",
+        "prettier": "3.1.0",
+        "why-is-node-running": "^2.2.2"
+    }
+}
