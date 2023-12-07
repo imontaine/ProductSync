@@ -6,7 +6,7 @@ import {
     mongoDatabaseName,
     mongoCollectionName,
     batchSizeMongo,
-    heartbeatUrl,
+    localDownloadDir,
 } from './config.ts';
 import { getReadyJobs, getJobsDB, jobsRemover } from './jobsDB.ts';
 import {
@@ -19,6 +19,7 @@ import {
 import { createQueue, executeOperationsInQueue } from './queue.ts';
 import { MongoClient } from 'mongodb';
 import {heartbeat} from "./debug.ts";
+import {checkLocalFileIsBeingProcessed} from "./csv";
 
 const jobsDB = getJobsDB(dbPath);
 const mongoClient = new MongoClient(mongoUri);
@@ -30,7 +31,9 @@ queue.on('active', () => {
     console.log(`Working on item #${++count}.  Size: ${queue.size}  Pending: ${queue.pending}`);
 });
 
-getReadyJobs(100000, getJobsDB(dbPath))
+
+checkLocalFileIsBeingProcessed(localDownloadDir)
+    .then(() => getReadyJobs(100000, getJobsDB(dbPath)))
     .then(convertJobsToDocuments)
     .then(convertDocumentsToReplaceOperations)
     .then(

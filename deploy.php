@@ -13,7 +13,7 @@ add('shared_dirs', ['downloads','db']);
 add('writable_dirs', []);
 
 task('npm:install', function(){
-    run('cd {{deploy_path}} && npm install');
+    run('cd {{deploy_path}}/current && npm install');
 });
 
 // Hosts

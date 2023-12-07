@@ -94,3 +94,12 @@ export const deleteLocalDownloadedFile = async (downloadedRemoteFile): Promise<D
     await fs.unlinkSync(`${localFilePath}`);
     return downloadedRemoteFile;
 };
+
+export const checkLocalFileIsBeingProcessed = (downloadDir): Promise<Boolean> => {
+    return new Promise((resolve, reject) => {
+        const fileList = fs.readdirSync(downloadDir);
+        fileList.filter(file => file.includes('.csv')).length ?
+            reject(new Error('There is a local file being processed')) :
+            resolve(true)
+    })
+}
